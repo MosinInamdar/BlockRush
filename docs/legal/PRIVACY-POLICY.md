@@ -5,7 +5,7 @@
 **Package:** `com.blockrush.app`  
 **Developer:** Mosin Inamdar
 
-> **Hosting:** Publish this file at a public HTTPS URL (GitHub Pages, your website, etc.) and paste that URL into Google Play Console. Replace bracketed placeholders before going live.
+> **Hosting:** Root `index.html` is the GitHub Pages version of this policy. Enable Pages from the repo root on the `main` branch.
 
 ---
 
@@ -34,7 +34,8 @@ When you use the app, these partners may collect data according to their own pol
 | ------------------- | --------------------------------------------- | ---------- |
 | Google AdMob        | Banner, interstitial, and rewarded ads        | Google LLC |
 | Firebase Analytics  | App usage events (e.g. game start, game over) | Google LLC |
-| Google Play Billing | In-app purchase (Remove Ads)                  | Google LLC |
+| Google Play Billing | In-app purchase (Remove Ads) on Android       | Google LLC |
+| Apple In-App Purchase | In-app purchase (Remove Ads) on iOS         | Apple Inc. |
 
 
 AdMob and Firebase may collect device identifiers, IP address, app interactions, and diagnostic data as described in [Google’s Privacy Policy](https://policies.google.com/privacy).
@@ -63,7 +64,7 @@ BlockRush is intended for a general audience. We do not knowingly collect person
 - **Sound:** Toggle sound effects in Settings
 - **Ads:** Purchase Remove Ads to hide banner and interstitial ads (rewarded ads remain optional)
 - **Analytics:** Limited opt-out may be available via device settings (e.g. Android “Opt out of Ads Personalization”); ad serving may still occur
-- **Delete local data:** Uninstall the app or clear storage in Android Settings → Apps → BlockRush
+- **Delete local data:** Uninstall the app or clear storage in device settings (Android: Settings → Apps → BlockRush; iOS: Settings → BlockRush)
 
 ---
 
