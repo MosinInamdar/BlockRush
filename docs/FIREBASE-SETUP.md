@@ -49,6 +49,15 @@ npx eas build --profile development --platform android
 - **Icon:** Replace `assets/icon.png` and Android adaptive icons before Phase 8.
 - **Splash:** Configured in `app.json` (`#0D0D14` background + icon). Tune via `expo-splash-screen` plugin.
 
-## Placeholder `google-services.json`
+## `google-services.json` and Git / EAS
 
-The repo includes a **placeholder** file so Android prebuild succeeds. **Replace it** with your real file from Firebase before measuring production analytics or shipping.
+EAS Build **only uploads files tracked by Git**. Do not list `google-services.json` in `.gitignore` unless you use [EAS file environment variables](https://docs.expo.dev/eas/environment-variables/file-environment-variables/) instead.
+
+After adding or updating the file:
+
+```bash
+git add google-services.json
+git commit -m "Add Firebase google-services.json for EAS builds"
+```
+
+Then run `eas build` again.

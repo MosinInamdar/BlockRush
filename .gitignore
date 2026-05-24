@@ -41,9 +41,8 @@ yarn-error.*
 /ios
 /android
 
-
-#google services
-google-services.json
+# Firebase config files (google-services.json) must be tracked for EAS Build.
+# Use a private repo, or EAS file secrets if you must keep it out of Git.
 
 #firebase
 firebase.json
