@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "108153875330",
+    "project_id": "western-tea-448011-f1",
+    "storage_bucket": "western-tea-448011-f1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:108153875330:android:b37c65ffacb4d44784bd9b",
+        "android_client_info": {
+          "package_name": "com.blockrush.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbI695dguU8-hmxa7OMbwnv2b5gmX3FY4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
