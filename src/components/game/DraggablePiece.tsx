@@ -11,7 +11,7 @@ interface DraggablePieceProps {
   used: boolean;
   hidden: boolean;
   enabled: boolean;
-  onDragStart: (index: 0 | 1 | 2, piece: Piece, x: number, y: number) => void;
+  onDragStart: (index: 0 | 1 | 2, piece: Piece, x: number, y: number, cellSize: number) => void;
   onDragMove: (x: number, y: number) => void;
   onDragEnd: () => void;
 }
@@ -32,8 +32,9 @@ export function DraggablePiece({
 
   const pan = Gesture.Pan()
     .enabled(enabled && !used)
-    .onBegin((e) => {
-      runOnJS(onDragStart)(pieceIndex, piece, e.absoluteX, e.absoluteY);
+    .minDistance(0)
+    .onStart((e) => {
+      runOnJS(onDragStart)(pieceIndex, piece, e.absoluteX, e.absoluteY, cellSize);
     })
     .onUpdate((e) => {
       runOnJS(onDragMove)(e.absoluteX, e.absoluteY);
@@ -43,7 +44,12 @@ export function DraggablePiece({
     });
 
   if (used) {
-    return <View style={[styles.slot, { width: slotWidth, height: slotHeight, opacity: 0.25 }]} />;
+    return (
+      <View
+        pointerEvents="none"
+        style={[styles.slot, { width: slotWidth, height: slotHeight, opacity: 0.25 }]}
+      />
+    );
   }
 
   return (
@@ -52,7 +58,7 @@ export function DraggablePiece({
         style={[
           styles.slot,
           { width: slotWidth, height: slotHeight },
-          hidden && styles.hidden,
+          hidden && styles.dragging,
         ]}
       >
         <PieceView piece={piece} cellSize={cellSize} />
@@ -66,7 +72,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  hidden: {
-    opacity: 0,
+  dragging: {
+    opacity: 0.2,
   },
 });

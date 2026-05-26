@@ -4,6 +4,9 @@ export const colors = {
   gridLine: '#1A1A2E',
   textPrimary: '#FFFFFF',
   textMuted: '#6B6B80',
+  surface: '#12121F',
+  surfaceBorder: '#252540',
+  overlay: 'rgba(0, 0, 0, 0.75)',
   block: {
     electricBlue: '#00D4FF',
     neonGreen: '#39FF14',

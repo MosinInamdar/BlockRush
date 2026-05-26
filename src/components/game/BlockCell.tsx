@@ -28,16 +28,19 @@ function BlockCellComponent({ size, color, ghost, filled, style }: BlockCellProp
   }
 
   if (filled && color) {
+    const glow = size >= 24;
     return (
       <View style={[styles.cell, { width: size, height: size }, style]}>
         <View
           style={[
             styles.block,
+            glow && styles.blockGlow,
             {
               width: inner,
               height: inner,
               backgroundColor: color,
               borderColor: withAlpha(color, 0.55),
+              shadowColor: color,
             },
           ]}
         />
@@ -76,10 +79,16 @@ const styles = StyleSheet.create({
     borderColor: colors.gridLine,
   },
   empty: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
   },
   block: {
     borderWidth: 1,
     borderRadius: 2,
+  },
+  blockGlow: {
+    shadowOpacity: 0.45,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 2,
   },
 });

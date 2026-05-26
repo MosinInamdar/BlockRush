@@ -3,6 +3,8 @@
  * Events match docs/MONETIZATION-ANALYTICS.md.
  */
 
+import { canUseFirebaseAnalytics } from '../../utils/nativeModules';
+
 export type AnalyticsParams = Record<string, string | number | boolean>;
 
 type AnalyticsModule = typeof import('@react-native-firebase/analytics').default;
@@ -13,6 +15,9 @@ let initAttempted = false;
 async function getAnalytics(): Promise<AnalyticsModule | null> {
   if (initAttempted) return analytics;
   initAttempted = true;
+  if (!canUseFirebaseAnalytics()) {
+    return null;
+  }
   try {
     const mod = await import('@react-native-firebase/analytics');
     analytics = mod.default;

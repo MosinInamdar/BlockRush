@@ -1,5 +1,7 @@
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, StyleSheet, Text, View } from 'react-native';
+import { NeonButton } from '../ui';
 import { colors, spacing, typography } from '../../theme';
+import { shadows } from '../../theme/shadows';
 
 interface ResumeDialogProps {
   visible: boolean;
@@ -16,13 +18,21 @@ export function ResumeDialog({ visible, savedScore, onContinue, onNewGame }: Res
           <Text style={styles.title}>Continue?</Text>
           <Text style={styles.body}>You have a game in progress with score {savedScore}.</Text>
 
-          <Pressable style={styles.primary} onPress={onContinue}>
-            <Text style={styles.primaryText}>Continue</Text>
-          </Pressable>
+          <NeonButton
+            variant="primary"
+            label="Continue"
+            onPress={onContinue}
+            fullWidth
+            style={styles.primaryBtn}
+          />
 
-          <Pressable style={styles.secondary} onPress={onNewGame}>
-            <Text style={styles.secondaryText}>New Game</Text>
-          </Pressable>
+          <NeonButton
+            variant="secondary"
+            label="New Game"
+            onPress={onNewGame}
+            fullWidth
+            style={styles.secondaryBtn}
+          />
         </View>
       </View>
     </Modal>
@@ -32,7 +42,7 @@ export function ResumeDialog({ visible, savedScore, onContinue, onNewGame }: Res
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.75)',
+    backgroundColor: colors.overlay,
     alignItems: 'center',
     justifyContent: 'center',
     padding: spacing.lg,
@@ -40,14 +50,16 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     maxWidth: 320,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.gridLine,
+    borderColor: colors.surfaceBorder,
     borderRadius: 16,
     padding: spacing.lg,
+    ...shadows.card,
   },
   title: {
     ...typography.score,
+    fontFamily: typography.display.fontFamily,
     color: colors.block.electricBlue,
     marginBottom: spacing.sm,
   },
@@ -56,24 +68,10 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     marginBottom: spacing.lg,
   },
-  primary: {
-    backgroundColor: colors.block.hotPink,
-    borderRadius: 12,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
+  primaryBtn: {
     marginBottom: spacing.sm,
   },
-  primaryText: {
-    color: colors.textPrimary,
-    fontWeight: '700',
-    fontSize: 16,
-  },
-  secondary: {
-    paddingVertical: spacing.sm,
-    alignItems: 'center',
-  },
-  secondaryText: {
-    color: colors.textMuted,
-    fontWeight: '600',
+  secondaryBtn: {
+    minHeight: 48,
   },
 });

@@ -1,15 +1,16 @@
 import { create } from 'zustand';
 import { REMOVE_ADS_PRODUCT_ID } from '../constants/monetization';
+import {
+  MUSIC_ENABLED_KEY,
+  REMOVE_ADS_KEY,
+  SFX_ENABLED_KEY,
+} from '../constants/storageKeys';
 import { analyticsEvents } from '../services/analytics/analyticsService';
 import {
   purchaseRemoveAds as requestRemoveAdsPurchase,
   restorePurchases,
 } from '../services/iap/iapService';
 import { storageGet, storageSet } from '../utils/safeStorage';
-
-const SFX_KEY = '@blockrush_sfx_enabled';
-const MUSIC_KEY = '@blockrush_music_enabled';
-export const REMOVE_ADS_KEY = '@blockrush_remove_ads';
 
 interface SettingsState {
   sfxEnabled: boolean;
@@ -34,8 +35,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
   loadSettings: async () => {
     const [sfx, music, removeAds] = await Promise.all([
-      storageGet(SFX_KEY),
-      storageGet(MUSIC_KEY),
+      storageGet(SFX_ENABLED_KEY),
+      storageGet(MUSIC_ENABLED_KEY),
       storageGet(REMOVE_ADS_KEY),
     ]);
     set({
@@ -47,7 +48,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
   setSfxEnabled: (enabled) => {
     set({ sfxEnabled: enabled });
-    void storageSet(SFX_KEY, String(enabled));
+    void storageSet(SFX_ENABLED_KEY, String(enabled));
   },
 
   toggleSfx: () => {
@@ -57,7 +58,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
   setMusicEnabled: (enabled) => {
     set({ musicEnabled: enabled });
-    void storageSet(MUSIC_KEY, String(enabled));
+    void storageSet(MUSIC_ENABLED_KEY, String(enabled));
   },
 
   toggleMusic: () => {

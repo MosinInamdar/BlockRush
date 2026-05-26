@@ -13,6 +13,6 @@ export function useGameFeedback() {
     const event = consumeFeedback();
     if (!event) return;
     const lines = clearEffect?.linesCleared ?? 0;
-    void feedback.play(event, lines);
+    feedback.playImmediate(event, lines);
   }, [pendingFeedback, consumeFeedback, clearEffect?.linesCleared]);
 }

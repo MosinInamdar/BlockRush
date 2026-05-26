@@ -5,11 +5,11 @@
     "scheme": "blockrush",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/app-icon.jpg",
     "userInterfaceStyle": "dark",
     "jsEngine": "hermes",
     "splash": {
-      "image": "./assets/icon.png",
+      "image": "./assets/app-icon.jpg",
       "resizeMode": "contain",
       "backgroundColor": "#0D0D14"
     },
@@ -23,9 +23,7 @@
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#0D0D14",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "foregroundImage": "./assets/app-icon.jpg"
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [
@@ -36,7 +34,7 @@
       ]
     },
     "web": {
-      "favicon": "./assets/favicon.png",
+      "favicon": "./assets/app-icon.jpg",
       "bundler": "metro"
     },
     "plugins": [
@@ -47,8 +45,8 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#0D0D14",
-          "image": "./assets/icon.png",
-          "imageWidth": 200
+          "image": "./assets/app-icon.jpg",
+          "imageWidth": 220
         }
       ],
       "@react-native-firebase/app",

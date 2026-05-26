@@ -48,30 +48,21 @@ Visual and audio requirements for implementation. Deviations need a note in [DEC
 
 ### Home
 
-- Logo / wordmark “BlockRush”
-- Best score
-- Primary: **Play**
-- Secondary: Settings
+- Shared `NeonBackdrop` (grid + vignette) with intro for visual continuity
+- Hero: logo + `GameWordmark`, `StatCard` for best score (shows “—” when zero)
+- Bottom-anchored CTAs: primary **PLAY**, secondary **Continue** when save exists
+- Settings: ghost `NeonButton` top-right
+- Staggered entrance animation on menu elements after intro
 - No account/login
 
 ### Game
 
-```
-┌────────────────────────────┐
-│  Score          Best       │
-├────────────────────────────┤
-│                            │
-│        8 × 8 Grid          │
-│                            │
-├────────────────────────────┤
-│   [Piece] [Piece] [Piece]  │
-├────────────────────────────┤
-│      (Banner ad slot)      │
-└────────────────────────────┘
-```
-
-- Piece tray: three slots, bottom above banner
-- Used pieces: removed or 30% opacity + non-interactive
+- `NeonBackdrop` variant `game` (gradients only; no decor grid behind play board)
+- Top: back (`NeonButton` ghost) + `GameHud` with `ScoreChip` score/best
+- Center: `GameBoardFrame` around 8×8 grid (`surface` cells, neon frame)
+- Bottom: `PieceTray` surface panel with three slots; banner ad in `surface` strip
+- Mount: board fade/scale in; tray stagger up
+- Piece tray: used pieces at 30% opacity, non-interactive
 
 ### Game over (modal or screen)
 
@@ -94,11 +85,11 @@ Visual and audio requirements for implementation. Deviations need a note in [DEC
 
 | Action | Behavior |
 |---|---|
-| Drag piece | Piece follows finger; lifted scale ~1.05 optional |
-| Ghost | Valid placement: piece color @ 30% opacity on grid cells |
-| Invalid | No ghost (optional red tint — v1 skip if costly) |
-| Drop valid | Snap to cell; `placePiece` |
-| Drop invalid | Animate back to tray |
+| Drag piece | Reanimated overlay tracks finger at 60fps; tray piece hidden |
+| Ghost | Valid placement: piece color @ 30% opacity; updates only when snap cell changes |
+| Invalid | No ghost |
+| Drop valid | Snap to cell; `placePiece`; place SFX immediate |
+| Drop invalid | Overlay clears instantly |
 | During clear anim | No drag/input (`isAnimating`) |
 
 **Snap:** `findSnapPosition` with 1-cell radius per [core-engine.md](../core-engine.md).
@@ -144,13 +135,13 @@ Scoring table: [core-engine.md](../core-engine.md) and [game-concept.md](../game
 
 | Event | Description |
 |---|---|
-| Place | Soft thunk, subtle reverb tail |
-| Clear 1 line | Rising synth tone |
-| Clear 2+ | Higher pitch / layered tone |
-| Game over | Descending reverb fade — no harsh buzzer |
+| Place | Soft thunk (~140Hz, 70ms); `feedback.playImmediate` on drop |
+| Clear 1 line | Rising two-tone sweep |
+| Clear 2+ | Three-note combo arpeggio + heavy haptic |
+| Game over | Low descending tone |
 | Music | Lo-fi electronic loop; **off by default** |
 
-**Files:** `assets/sounds/` — `.mp3` or `.wav`, short, &lt;100KB each where possible.
+**Implementation:** MP3 assets in `assets/sounds/` via `src/constants/soundAssets.ts`; playback in `src/services/feedback.ts` and `src/services/backgroundMusic.ts`. `prewarm()` on game mount preloads SFX.
 
 **Licensing:** Document source in DECISIONS (BFXR, Kenney, custom, etc.).
 

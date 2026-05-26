@@ -4,6 +4,7 @@ import {
   LAST_INTERSTITIAL_KEY,
 } from '../../constants/monetization';
 import { analyticsEvents } from '../analytics/analyticsService';
+import { canUseGoogleMobileAds } from '../../utils/nativeModules';
 import { storageGet, storageSet } from '../../utils/safeStorage';
 
 type GoogleAdsModule = typeof import('react-native-google-mobile-ads');
@@ -21,9 +22,18 @@ export function isAdsNativeAvailable(): boolean {
   return initialized && adsModule !== null;
 }
 
+export function getAdsModule(): GoogleAdsModule | null {
+  return adsModule;
+}
+
 export async function initAds(): Promise<boolean> {
   if (initialized) return adsModule !== null;
   if (initFailed) return false;
+  if (!canUseGoogleMobileAds()) {
+    initFailed = true;
+    initialized = true;
+    return false;
+  }
   try {
     adsModule = await import('react-native-google-mobile-ads');
     await adsModule.MobileAds().initialize();

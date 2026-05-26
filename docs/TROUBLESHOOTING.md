@@ -95,6 +95,25 @@ If you use a custom dev client, rebuild it after adding `expo-audio`.
 
 ---
 
+## `RNFBAppModule` / `RNGoogleMobileAdsModule` could not be found
+
+### Cause
+
+Those modules are only compiled into a **custom dev client** or **store build**, not Expo Go. Importing the JS packages without the native binary triggers a red error.
+
+BlockRush gates Firebase and AdMob behind `TurboModuleRegistry.get()` checks in `src/utils/nativeModules.ts` so Expo Go runs without crashing.
+
+### Fix
+
+- **Expo Go (UI / gameplay only):** Restart Metro with `npx expo start --clear`. Errors should stop; ads/analytics no-op in dev.
+- **Real ads / Firebase:** Install a dev build that includes the plugins in `app.json`:
+  ```bash
+  npx expo run:android
+  ```
+  or `eas build --profile development --platform android`, then open the app from that APK — not Expo Go.
+
+---
+
 ## Still stuck?
 
 - Same Wi‑Fi for phone and PC (or use `npx expo start --tunnel`)

@@ -1,5 +1,5 @@
 import { REMOVE_ADS_PRODUCT_ID } from '../../constants/monetization';
-import { REMOVE_ADS_KEY } from '../../store/settingsStore';
+import { REMOVE_ADS_KEY } from '../../constants/storageKeys';
 import { storageGet, storageSet } from '../../utils/safeStorage';
 
 type IapModule = typeof import('expo-iap');

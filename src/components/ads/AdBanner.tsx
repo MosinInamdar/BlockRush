@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { analyticsEvents } from '../../services/analytics/analyticsService';
-import { AD_UNIT_IDS, initAds, isAdsNativeAvailable } from '../../services/ads/adService';
+import { AD_UNIT_IDS, getAdsModule, initAds, isAdsNativeAvailable } from '../../services/ads/adService';
 import { useSettingsStore } from '../../store/settingsStore';
 import { colors, spacing, typography } from '../../theme';
 
@@ -18,17 +18,22 @@ export function AdBanner() {
     return null;
   }
 
-  if (!ready) {
+  const ads = getAdsModule();
+
+  if (!ready || !ads) {
     return (
-      <View style={styles.placeholder}>
-        {__DEV__ && <Text style={styles.hint}>Ads need a dev build</Text>}
+      <View style={styles.strip}>
+        <View style={styles.placeholder}>
+          {__DEV__ && <Text style={styles.hint}>Ads need a dev build</Text>}
+        </View>
       </View>
     );
   }
 
-  const { BannerAd, BannerAdSize } = require('react-native-google-mobile-ads') as typeof import('react-native-google-mobile-ads');
+  const { BannerAd, BannerAdSize } = ads;
 
   return (
+    <View style={styles.strip}>
     <View style={styles.bannerWrap}>
       <BannerAd
         unitId={AD_UNIT_IDS.banner}
@@ -38,10 +43,16 @@ export function AdBanner() {
         }}
       />
     </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  strip: {
+    borderTopWidth: 1,
+    borderTopColor: colors.surfaceBorder,
+    backgroundColor: colors.surface,
+  },
   placeholder: {
     height: spacing.adBanner,
     alignItems: 'center',

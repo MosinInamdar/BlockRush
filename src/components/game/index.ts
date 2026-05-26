@@ -5,6 +5,8 @@ export { ScreenShake } from './ScreenShake';
 export { DraggablePiece } from './DraggablePiece';
 export { GameGrid } from './GameGrid';
 export { GameHeader } from './GameHeader';
+export { GameHud } from './GameHud';
+export { GameScreen } from './GameScreen';
 export { GameOverOverlay } from './GameOverOverlay';
 export { PieceTray } from './PieceTray';
 export { PieceView } from './PieceView';

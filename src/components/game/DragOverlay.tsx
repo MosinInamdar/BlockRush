@@ -1,42 +1,59 @@
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
 import { Piece } from '../../engine/types';
 import { PieceView } from './PieceView';
 
 interface DragOverlayProps {
   piece: Piece;
   cellSize: number;
-  absoluteX: number;
-  absoluteY: number;
+  width: number;
+  height: number;
+  overlayX: SharedValue<number>;
+  overlayY: SharedValue<number>;
+  overlayVisible: SharedValue<number>;
+  /** Window offset of the drag host container (from measureInWindow). */
+  hostOriginX: SharedValue<number>;
+  hostOriginY: SharedValue<number>;
 }
 
-export function DragOverlay({ piece, cellSize, absoluteX, absoluteY }: DragOverlayProps) {
-  const width = piece.boundingBox.cols * cellSize;
-  const height = piece.boundingBox.rows * cellSize;
+export function DragOverlay({
+  piece,
+  cellSize,
+  width,
+  height,
+  overlayX,
+  overlayY,
+  overlayVisible,
+  hostOriginX,
+  hostOriginY,
+}: DragOverlayProps) {
+  const style = useAnimatedStyle(() => {
+    const x = overlayX.value - hostOriginX.value - width / 2;
+    const y = overlayY.value - hostOriginY.value - height / 2;
+    return {
+      opacity: overlayVisible.value,
+      transform: [{ translateX: x }, { translateY: y }, { scale: 1.08 }],
+    };
+  });
 
   return (
-    <View
+    <Animated.View
+      style={[styles.overlay, { width, height }, style]}
       pointerEvents="none"
-      style={[
-        styles.overlay,
-        {
-          left: absoluteX - width / 2,
-          top: absoluteY - height / 2,
-        },
-      ]}
+      collapsable={false}
     >
-      <View style={styles.lift}>
-        <PieceView piece={piece} cellSize={cellSize} />
-      </View>
-    </View>
+      <PieceView piece={piece} cellSize={cellSize} />
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   overlay: {
     position: 'absolute',
-    zIndex: 100,
-  },
-  lift: {
-    transform: [{ scale: 1.05 }],
+    left: 0,
+    top: 0,
+    zIndex: 1000,
+    elevation: 1000,
   },
 });

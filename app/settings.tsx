@@ -59,7 +59,7 @@ export default function SettingsScreen() {
         />
         <SettingsRow
           label="Music"
-          description="Background music (coming in a future update)"
+          description="Lo-fi background loop while playing"
           value={musicEnabled}
           onValueChange={setMusicEnabled}
         />
