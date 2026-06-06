@@ -14,6 +14,7 @@ import { GameBoardFrame, NeonBackdrop, NeonButton } from '../ui';
 import { GRID_SIZE } from '../../engine/constants';
 import { useAutoSaveGame } from '../../hooks/useAutoSaveGame';
 import { useGameFeedback } from '../../hooks/useGameFeedback';
+import { useGameTutorial } from '../../hooks/useGameTutorial';
 import { useInterstitialOnGameOver } from '../../hooks/useInterstitialOnGameOver';
 import { useGameInput } from '../../hooks/useGameInput';
 import { useGridLayout } from '../../hooks/useGridLayout';
@@ -23,6 +24,7 @@ import { showInterstitialIfAllowed, showRewardedAd } from '../../services/ads/ad
 import { useGameStore } from '../../store/gameStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { spacing } from '../../theme';
+import { TutorialHintBanner, TutorialWalkthrough } from '../meta';
 import {
   ClearEffectsLayer,
   DragOverlay,
@@ -56,6 +58,7 @@ export function GameScreen() {
   useAutoSaveGame();
   useInterstitialOnGameOver(isGameOver);
   useGameFeedback();
+  const { tutorialActive, currentHint, dismissHint } = useGameTutorial();
 
   const { gridRef, layout, onGridLayout, remeasureGrid } = useGridLayout(cellSize);
   const {
@@ -206,6 +209,11 @@ export function GameScreen() {
         onWatchContinue={handleWatchContinue}
         onGoHome={handleGoHome}
       />
+
+      <TutorialWalkthrough visible={tutorialActive} />
+      {currentHint && !tutorialActive && (
+        <TutorialHintBanner message={currentHint} onDismiss={dismissHint} />
+      )}
 
       <View
         ref={dragHostRef}

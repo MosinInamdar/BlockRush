@@ -16,7 +16,22 @@ const EVENT_TO_ASSET: Record<FeedbackEvent, SfxAssetKey> = {
 };
 
 let sfxPlayers: Partial<Record<FeedbackEvent, AudioPlayer>> | null = null;
+let prewarmPromise: Promise<void> | null = null;
 let lastPlayAt = 0;
+
+async function createPlayerForEvent(
+  expo: NonNullable<Awaited<ReturnType<typeof ensureAudioSession>>>,
+  event: FeedbackEvent
+): Promise<AudioPlayer> {
+  const assetKey = EVENT_TO_ASSET[event];
+  const player = expo.createAudioPlayer(soundAssets[assetKey], {
+    downloadFirst: true,
+    keepAudioSessionActive: true,
+  });
+  player.volume = SFX_VOLUME;
+  await expo.preload(soundAssets[assetKey]);
+  return player;
+}
 
 async function ensureSfxPlayers(): Promise<Partial<Record<FeedbackEvent, AudioPlayer>> | null> {
   if (sfxPlayers) return sfxPlayers;
@@ -29,38 +44,47 @@ async function ensureSfxPlayers(): Promise<Partial<Record<FeedbackEvent, AudioPl
   try {
     await Promise.all(
       events.map(async (event) => {
-        const assetKey = EVENT_TO_ASSET[event];
-        const player = expo.createAudioPlayer(soundAssets[assetKey], {
-          downloadFirst: true,
-          keepAudioSessionActive: true,
-        });
-        player.volume = SFX_VOLUME;
-        players[event] = player;
-        await expo.preload(soundAssets[assetKey]);
+        players[event] = await createPlayerForEvent(expo, event);
       })
     );
     sfxPlayers = players;
     return players;
   } catch {
+    sfxPlayers = null;
     return null;
   }
 }
 
-function playSfx(event: FeedbackEvent) {
+async function playSfx(event: FeedbackEvent) {
   if (!useSettingsStore.getState().sfxEnabled) return;
-  const player = sfxPlayers?.[event];
+
+  let pool = await ensureSfxPlayers();
+  let player = pool?.[event];
+
   if (!player) {
-    void ensureSfxPlayers().then((pool) => {
-      const retry = pool?.[event];
-      if (retry) {
-        void retry.seekTo(0);
-        retry.play();
-      }
-    });
-    return;
+    sfxPlayers = null;
+    pool = await ensureSfxPlayers();
+    player = pool?.[event];
+    if (!player) return;
   }
-  void player.seekTo(0);
-  player.play();
+
+  try {
+    await player.seekTo(0);
+    player.play();
+  } catch {
+    sfxPlayers = null;
+    const expo = await ensureAudioSession();
+    if (!expo) return;
+    try {
+      const retryPlayer = await createPlayerForEvent(expo, event);
+      if (!sfxPlayers) sfxPlayers = {};
+      sfxPlayers[event] = retryPlayer;
+      await retryPlayer.seekTo(0);
+      retryPlayer.play();
+    } catch {
+      // Audio unavailable on this device/session
+    }
+  }
 }
 
 function runHaptic(event: FeedbackEvent) {
@@ -84,13 +108,15 @@ function runHaptic(event: FeedbackEvent) {
 }
 
 function dispatchSfx(event: FeedbackEvent) {
-  playSfx(event);
+  void playSfx(event);
   runHaptic(event);
 }
 
 export const feedback = {
   async prewarm() {
-    await ensureSfxPlayers();
+    if (prewarmPromise) return prewarmPromise;
+    prewarmPromise = ensureSfxPlayers().then(() => undefined);
+    return prewarmPromise;
   },
 
   async play(event: FeedbackEvent, linesCleared = 0) {

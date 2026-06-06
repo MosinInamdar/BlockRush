@@ -14,6 +14,7 @@ import { isValidPlacement } from '../engine/placement';
 import { calculateTurnScore } from '../engine/score';
 import { Grid, Piece } from '../engine/types';
 import { FeedbackEvent } from '../services/feedback';
+import { useTutorialStore } from './tutorialStore';
 
 export const BEST_SCORE_KEY = '@blockrush_best_score';
 export const SAVED_GAME_KEY = '@blockrush_saved_game';
@@ -169,6 +170,8 @@ export const useGameStore = create<GameState>((set, get) => ({
         bestScore: state.bestScore,
         isGameOver: false,
       });
+      useTutorialStore.getState().recordPlacement();
+      useTutorialStore.getState().recordClear();
     } else {
       set({
         grid: pending.grid,
@@ -180,6 +183,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         clearEffect: null,
         pendingFeedback: gameOver ? 'gameover' : 'place',
       });
+      useTutorialStore.getState().recordPlacement();
       if (gameOver) {
         trackGameOver(newScore, get().sessionLinesCleared);
       }

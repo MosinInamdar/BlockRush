@@ -16,6 +16,7 @@ import { AppIntroSplash } from '../src/components/AppIntroSplash';
 import { useBackgroundMusic } from '../src/hooks/useBackgroundMusic';
 import { useMonetizationInit } from '../src/hooks/useMonetizationInit';
 import { analyticsEvents } from '../src/services/analytics/analyticsService';
+import { feedback } from '../src/services/feedback';
 import { useGameStore } from '../src/store/gameStore';
 import { useSettingsStore } from '../src/store/settingsStore';
 import { colors } from '../src/theme/colors';
@@ -52,6 +53,7 @@ export default function RootLayout() {
         }
       } finally {
         setAppReady(true);
+        void feedback.prewarm();
       }
     })();
   }, [loadBestScore, loadSettings]);

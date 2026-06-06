@@ -31,8 +31,17 @@ jest.mock('@react-native-firebase/analytics', () => () => ({
 }));
 
 jest.mock('expo-iap', () => ({
-  initConnection: jest.fn(() => Promise.resolve(false)),
+  initConnection: jest.fn(() => Promise.resolve(true)),
   purchaseUpdatedListener: jest.fn(() => ({ remove: jest.fn() })),
+  purchaseErrorListener: jest.fn(() => ({ remove: jest.fn() })),
+  fetchProducts: jest.fn(() =>
+    Promise.resolve([
+      {
+        id: 'blockrush_remove_ads',
+        displayPrice: '$0.99',
+      },
+    ])
+  ),
   getAvailablePurchases: jest.fn(() => Promise.resolve([])),
   requestPurchase: jest.fn(() => Promise.resolve()),
   finishTransaction: jest.fn(() => Promise.resolve()),

@@ -23,7 +23,7 @@ interface SettingsState {
   setMusicEnabled: (enabled: boolean) => void;
   toggleMusic: () => void;
   setRemoveAdsPurchased: (purchased: boolean) => void;
-  purchaseRemoveAds: () => Promise<'success' | 'cancelled' | 'unavailable'>;
+  purchaseRemoveAds: () => Promise<'pending' | 'cancelled' | 'unavailable'>;
   restoreRemoveAds: () => Promise<boolean>;
 }
 
@@ -78,8 +78,11 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     set({ iapBusy: true });
     try {
       const result = await requestRemoveAdsPurchase();
-      if (result === 'success') {
-        get().setRemoveAdsPurchased(true);
+      if (result === 'pending') {
+        const saved = await storageGet(REMOVE_ADS_KEY);
+        if (saved === 'true') {
+          get().setRemoveAdsPurchased(true);
+        }
       }
       return result;
     } finally {

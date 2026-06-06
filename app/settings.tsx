@@ -1,9 +1,13 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { REMOVE_ADS_PRODUCT_ID } from '../src/constants/monetization';
 import { SettingsInfoRow, SettingsRow } from '../src/components/meta';
+import { REMOVE_ADS_PRODUCT_ID } from '../src/constants/monetization';
+import {
+  getRemoveAdsDisplayPrice,
+  initIap,
+} from '../src/services/iap/iapService';
 import { useSettingsStore } from '../src/store/settingsStore';
 import { colors, spacing, typography } from '../src/theme';
 
@@ -15,19 +19,48 @@ export default function SettingsScreen() {
   const iapBusy = useSettingsStore((s) => s.iapBusy);
   const setSfxEnabled = useSettingsStore((s) => s.setSfxEnabled);
   const setMusicEnabled = useSettingsStore((s) => s.setMusicEnabled);
+  const setRemoveAdsPurchased = useSettingsStore((s) => s.setRemoveAdsPurchased);
   const purchaseRemoveAds = useSettingsStore((s) => s.purchaseRemoveAds);
   const restoreRemoveAds = useSettingsStore((s) => s.restoreRemoveAds);
   const [status, setStatus] = useState<string | null>(null);
+  const [storePrice, setStorePrice] = useState<string | null>(null);
+  const purchasePending = useRef(false);
+
+  useEffect(() => {
+    void initIap(() => setRemoveAdsPurchased(true)).then((ready) => {
+      if (ready) {
+        setStorePrice(getRemoveAdsDisplayPrice());
+      }
+    });
+  }, [setRemoveAdsPurchased]);
+
+  useEffect(() => {
+    if (purchasePending.current && removeAdsPurchased) {
+      setStatus('Ads removed — thank you!');
+      purchasePending.current = false;
+    }
+  }, [removeAdsPurchased]);
+
+  const priceLabel = storePrice ?? '₹99 / $0.99';
 
   const onBuyRemoveAds = async () => {
     setStatus(null);
     const result = await purchaseRemoveAds();
-    if (result === 'success') {
-      setStatus('Ads removed — thank you!');
+    if (result === 'pending') {
+      purchasePending.current = true;
+      if (useSettingsStore.getState().removeAdsPurchased) {
+        setStatus('Ads removed — thank you!');
+        purchasePending.current = false;
+      } else {
+        setStatus('Confirm your purchase in the store dialog…');
+      }
     } else if (result === 'cancelled') {
+      purchasePending.current = false;
       setStatus(null);
     } else {
-      setStatus('Purchase unavailable. Use a dev build with Play Billing configured.');
+      setStatus(
+        'Purchase unavailable. Install the store build, ensure Play Billing is configured, and that the product is active in Play Console.'
+      );
     }
   };
 
@@ -76,7 +109,7 @@ export default function SettingsScreen() {
               onPress={() => void onBuyRemoveAds()}
               disabled={iapBusy}
             >
-              <Text style={styles.storeBtnText}>Buy Remove Ads — ₹99 / $0.99</Text>
+              <Text style={styles.storeBtnText}>Buy Remove Ads — {priceLabel}</Text>
             </Pressable>
             <Pressable
               style={styles.restoreBtn}
