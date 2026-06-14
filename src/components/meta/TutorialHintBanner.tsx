@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, typography } from '../../theme';
 
 interface TutorialHintBannerProps {
@@ -6,11 +7,19 @@ interface TutorialHintBannerProps {
   onDismiss: () => void;
 }
 
+/** Non-blocking hint shown below the HUD — does not cover the piece tray. */
 export function TutorialHintBanner({ message, onDismiss }: TutorialHintBannerProps) {
+  const insets = useSafeAreaInsets();
+
   return (
-    <View style={styles.wrap}>
-      <View style={styles.banner}>
-        <Text style={styles.text}>{message}</Text>
+    <View
+      style={[styles.wrap, { top: insets.top + 56 }]}
+      pointerEvents="box-none"
+    >
+      <View style={styles.banner} pointerEvents="auto">
+        <Text style={styles.text} numberOfLines={2}>
+          {message}
+        </Text>
         <Pressable onPress={onDismiss} hitSlop={8} style={styles.dismiss}>
           <Text style={styles.dismissText}>✕</Text>
         </Pressable>
@@ -24,9 +33,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: spacing.md,
     right: spacing.md,
-    bottom: spacing.md,
-    zIndex: 400,
-    elevation: 400,
+    zIndex: 440,
+    elevation: 440,
   },
   banner: {
     flexDirection: 'row',

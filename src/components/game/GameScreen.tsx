@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, {
   Easing,
@@ -24,7 +24,14 @@ import { showInterstitialIfAllowed, showRewardedAd } from '../../services/ads/ad
 import { useGameStore } from '../../store/gameStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { spacing } from '../../theme';
-import { TutorialHintBanner, TutorialWalkthrough } from '../meta';
+import { safeGoBack } from '../../utils/navigation';
+import {
+  TutorialHintBanner,
+  TutorialVisualGuide,
+  type ScreenRect,
+  TutorialWalkthrough,
+} from '../meta';
+import { TUTORIAL_STEPS, useTutorialStore } from '../../store/tutorialStore';
 import {
   ClearEffectsLayer,
   DragOverlay,
@@ -59,6 +66,8 @@ export function GameScreen() {
   useInterstitialOnGameOver(isGameOver);
   useGameFeedback();
   const { tutorialActive, currentHint, dismissHint } = useGameTutorial();
+  const tutorialStepIndex = useTutorialStore((s) => s.stepIndex);
+  const tutorialStep = tutorialActive ? TUTORIAL_STEPS[tutorialStepIndex] ?? null : null;
 
   const { gridRef, layout, onGridLayout, remeasureGrid } = useGridLayout(cellSize);
   const {
@@ -76,6 +85,16 @@ export function GameScreen() {
   } = usePieceDrag(layout);
 
   const dragHostRef = useRef<View>(null);
+  const trayRef = useRef<View>(null);
+  const [trayLayout, setTrayLayout] = useState<ScreenRect | null>(null);
+
+  const measureTrayWindow = useCallback(() => {
+    trayRef.current?.measureInWindow((x, y, width, height) => {
+      if (width > 0 && height > 0) {
+        setTrayLayout({ x, y, width, height });
+      }
+    });
+  }, []);
 
   const measureDragHostWindow = useCallback(() => {
     dragHostRef.current?.measureInWindow((x, y) => {
@@ -108,6 +127,15 @@ export function GameScreen() {
     const id = requestAnimationFrame(() => measureDragHostWindow());
     return () => cancelAnimationFrame(id);
   }, [cellSize, measureDragHostWindow]);
+
+  useEffect(() => {
+    if (!tutorialActive) return;
+    const id = requestAnimationFrame(() => {
+      remeasureGrid();
+      measureTrayWindow();
+    });
+    return () => cancelAnimationFrame(id);
+  }, [tutorialActive, tutorialStepIndex, cellSize, remeasureGrid, measureTrayWindow]);
 
   useEffect(() => {
     if (isGameOver) {
@@ -153,12 +181,14 @@ export function GameScreen() {
           <NeonButton
             variant="ghost"
             label="←"
-            onPress={() => router.back()}
+            onPress={() => safeGoBack(router)}
             accessibilityLabel="Leave game"
             style={styles.backBtn}
           />
           <GameHud score={score} bestScore={bestScore} />
         </View>
+
+        <TutorialWalkthrough visible={tutorialActive} />
 
         <ScreenShake active={shakeBoard} intensity={shakeIntensity} style={styles.board}>
           <Animated.View style={[styles.boardInner, boardEnterStyle]}>
@@ -185,16 +215,18 @@ export function GameScreen() {
         </ScreenShake>
 
         <Animated.View style={trayEnterStyle}>
-          <PieceTray
-            pieces={currentPieces}
-            usedPieces={usedPieces}
-            cellSize={cellSize}
-            draggingIndex={dragMeta?.pieceIndex ?? null}
-            canInteract={canInteract}
-            onDragStart={startDrag}
-            onDragMove={moveDrag}
-            onDragEnd={endDrag}
-          />
+          <View ref={trayRef} onLayout={measureTrayWindow} collapsable={false}>
+            <PieceTray
+              pieces={currentPieces}
+              usedPieces={usedPieces}
+              cellSize={cellSize}
+              draggingIndex={dragMeta?.pieceIndex ?? null}
+              canInteract={canInteract}
+              onDragStart={startDrag}
+              onDragMove={moveDrag}
+              onDragEnd={endDrag}
+            />
+          </View>
         </Animated.View>
 
         <AdBanner />
@@ -210,10 +242,16 @@ export function GameScreen() {
         onGoHome={handleGoHome}
       />
 
-      <TutorialWalkthrough visible={tutorialActive} />
       {currentHint && !tutorialActive && (
         <TutorialHintBanner message={currentHint} onDismiss={dismissHint} />
       )}
+
+      <TutorialVisualGuide
+        visible={tutorialActive}
+        step={tutorialStep}
+        gridLayout={layout}
+        trayLayout={trayLayout}
+      />
 
       <View
         ref={dragHostRef}

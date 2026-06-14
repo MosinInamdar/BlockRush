@@ -10,6 +10,7 @@ import {
 } from '../src/services/iap/iapService';
 import { useSettingsStore } from '../src/store/settingsStore';
 import { colors, spacing, typography } from '../src/theme';
+import { safeGoBack } from '../src/utils/navigation';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -75,7 +76,7 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={12}>
+        <Pressable onPress={() => safeGoBack(router)} hitSlop={12}>
           <Text style={styles.back}>← Back</Text>
         </Pressable>
         <Text style={styles.title}>Settings</Text>

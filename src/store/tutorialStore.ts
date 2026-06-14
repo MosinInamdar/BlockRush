@@ -13,12 +13,23 @@ export type TutorialStepId =
   | 'combo'
   | 'done';
 
+export type TutorialHighlight =
+  | 'none'
+  | 'grid'
+  | 'tray'
+  | 'grid-row'
+  | 'drag-demo';
+
 export interface TutorialStep {
   id: TutorialStepId;
   title: string;
   body: string;
+  emoji: string;
+  highlight: TutorialHighlight;
   /** Advance when the player performs this action. */
   waitFor?: 'placement' | 'clear';
+  /** Example row index (0–7) highlighted during the clear step. */
+  demoGridRow?: number;
 }
 
 export const TUTORIAL_STEPS: TutorialStep[] = [
@@ -26,33 +37,46 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     id: 'welcome',
     title: 'Welcome to BlockRush!',
     body: 'Fill rows and columns on the 8×8 grid to clear them and score points.',
+    emoji: '🎮',
+    highlight: 'grid',
   },
   {
     id: 'drag',
     title: 'Drag a block',
-    body: 'Pick up a shape from the tray below and drag it onto the board.',
+    body: 'Pick up a shape from the tray and drop it on the board.',
+    emoji: '✋',
+    highlight: 'drag-demo',
     waitFor: 'placement',
   },
   {
     id: 'place',
     title: 'Nice placement!',
     body: 'Blocks snap to the grid. Try to complete a full row or column.',
+    emoji: '✅',
+    highlight: 'none',
   },
   {
     id: 'clear',
     title: 'Clear lines',
-    body: 'When a row or column is completely filled, it clears and awards bonus points.',
+    body: 'Fill an entire row or column — it clears and awards bonus points.',
+    emoji: '💥',
+    highlight: 'grid-row',
+    demoGridRow: 6,
     waitFor: 'clear',
   },
   {
     id: 'combo',
     title: 'Combo bonus',
-    body: 'Clear two or more lines at once for a combo — bigger clears mean bigger scores!',
+    body: 'Clear two or more lines at once for a combo and a bigger score boost!',
+    emoji: '🔥',
+    highlight: 'grid',
   },
   {
     id: 'done',
-    title: 'You\'re ready!',
-    body: 'Use all three pieces to get a fresh set. Keep playing until no moves remain. Good luck!',
+    title: "You're ready!",
+    body: 'Use all three pieces to get a fresh set. Keep playing until no moves remain!',
+    emoji: '🚀',
+    highlight: 'none',
   },
 ];
 
